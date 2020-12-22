@@ -1,11 +1,9 @@
 import telebot
 from telebot import types
 import requests
-import config
 import datetime
-from PIL import Image
 from urllib.request import urlopen
-
+import config
 
 # https://api.openweathermap.org/data/2.5/onecall?lon=74.59&lat=42.87&exclude=hourly,minutely,current,alerts&appid=a9625fde9a815d299c2e9a3e73429e71
 
