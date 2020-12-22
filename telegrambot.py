@@ -48,13 +48,13 @@ def callback_worker(call):
     if call.data == "current":  # call.data это callback_data, которую мы указали при объявлении кнопки
         try:
         	icon = weather.get('weather')[0].get('icon')
-        	url = f'http://openweathermap.org/img/wn/{icon}@2x.png'
+        	url = f'http://openweathermap.org/img/wn/{icon}@4x.png'
 
         	bot.send_photo(mess.chat.id, url, caption='В городе ' + str(weather['name'])\
         	+ ' температура: ' + str(float(weather['main']['temp'])) + ' °C' + '\n'\
         	+ 'Максимальная температура: ' + str(float(weather['main']['temp_max'])) + ' °C' + '\n'\
         	+ 'Минимальная температура: ' + str(float(weather['main']['temp_min'])) + ' °C' + '\n'\
-        	+ 'Давление: ' + str(float(weather['main']['pressure'])) + '\n'\
+        	+ 'Давление: ' + str(weather['main']['pressure']) + '\n'\
         	+ 'Влажность: ' + str(float(weather['main']['humidity'])) + ' %' + '\n')
 
 
@@ -100,7 +100,7 @@ def get_forecast(count, weather):
 
 def get_icon(count, weather):
 	icon = weather.get('daily')[count].get('weather')[0].get('icon')
-	url = f'http://openweathermap.org/img/wn/{icon}@2x.png'
+	url = f'http://openweathermap.org/img/wn/{icon}@4x.png'
 	# image = Image.open(urlopen(url))
 	# print(image)
 	return url
