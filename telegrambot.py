@@ -43,20 +43,25 @@ def weather_send(message):
 def callback_worker(call):
     weather = get_json()
     if call.data == "current":  # call.data это callback_data, которую мы указали при объявлении кнопки
+        try:
 
-        bot.send_message(mess.chat.id, 'В городе '
-                         + str(weather['name']) + ' температура: '
-                         + str(float(weather['main']['temp'])) + ' °C' + '\n'
-                         + 'Максимальная температура: '
-                         + str(float(weather['main']
-                                     ['temp_max'])) + ' °C' + '\n'
-                         + 'Минимальная температура: '
-                         + str(float(weather['main']
-                                     ['temp_min'])) + ' °C' + '\n'
-                         + 'Давление: '
-                         + str(float(weather['main']['pressure'])) + '\n'
-                         + 'Влажность: '
-                         + str(float(weather['main']['humidity'])) + ' %' + '\n')
+            bot.send_message(mess.chat.id, 'В городе '
+                             + str(weather['name']) + ' температура: '
+                             + str(float(weather['main']['temp'])) + ' °C' + '\n'
+                             + 'Максимальная температура: '
+                             + str(float(weather['main']
+                                         ['temp_max'])) + ' °C' + '\n'
+                             + 'Минимальная температура: '
+                             + str(float(weather['main']
+                                         ['temp_min'])) + ' °C' + '\n'
+                             + 'Давление: '
+                             + str(float(weather['main']['pressure'])) + '\n'
+                             + 'Влажность: '
+                             + str(float(weather['main']['humidity'])) + ' %' + '\n')
+        except:
+            bot.send_message(mess.chat.id, 'Город ' + city + ' не найден!')
+
+
 
     elif call.data == "daily":
         lon, lat = get_json()['coord']['lon'], get_json()['coord']['lat']
