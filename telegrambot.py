@@ -3,6 +3,9 @@ from telebot import types
 import requests
 import config
 import datetime
+from PIL import Image
+from urllib.request import urlopen
+
 
 # https://api.openweathermap.org/data/2.5/onecall?lon=74.59&lat=42.87&exclude=hourly,minutely,current,alerts&appid=a9625fde9a815d299c2e9a3e73429e71
 
@@ -24,17 +27,19 @@ def weather_send(message):
 
     try:
         weather = get_json()
-        keyboard = types.InlineKeyboardMarkup()  # наша клавиатура
-        key_current = types.InlineKeyboardButton(
-            text='Сейчас', callback_data='current')
-        keyboard.add(key_current)
-        key_daily = types.InlineKeyboardButton(
-            text='На неделю', callback_data='daily')
-        keyboard.add(key_daily)
-        question = 'На какой период показать погоду?'
-        bot.send_message(message.from_user.id, text=question,
-                         reply_markup=keyboard)
-
+        if weather['name'] != None:
+	        keyboard = types.InlineKeyboardMarkup()  # наша клавиатура
+	        key_current = types.InlineKeyboardButton(
+	            text='Сейчас', callback_data='current')
+	        keyboard.add(key_current)
+	        key_daily = types.InlineKeyboardButton(
+	            text='На неделю', callback_data='daily')
+	        keyboard.add(key_daily)
+	        question = 'На какой период показать погоду?'
+	        bot.send_message(message.from_user.id, text=question,
+	                         reply_markup=keyboard)
+        else:
+            bot.send_message(message.chat.id, 'Город ' + city + ' не найден!')
     except:
         bot.send_message(message.chat.id, 'Город ' + city + ' не найден!')
 
@@ -44,20 +49,17 @@ def callback_worker(call):
     weather = get_json()
     if call.data == "current":  # call.data это callback_data, которую мы указали при объявлении кнопки
         try:
+        	icon = weather.get('weather')[0].get('icon')
+        	url = f'http://openweathermap.org/img/wn/{icon}@2x.png'
 
-            bot.send_message(mess.chat.id, 'В городе '
-                             + str(weather['name']) + ' температура: '
-                             + str(float(weather['main']['temp'])) + ' °C' + '\n'
-                             + 'Максимальная температура: '
-                             + str(float(weather['main']
-                                         ['temp_max'])) + ' °C' + '\n'
-                             + 'Минимальная температура: '
-                             + str(float(weather['main']
-                                         ['temp_min'])) + ' °C' + '\n'
-                             + 'Давление: '
-                             + str(float(weather['main']['pressure'])) + '\n'
-                             + 'Влажность: '
-                             + str(float(weather['main']['humidity'])) + ' %' + '\n')
+        	bot.send_photo(mess.chat.id, url, caption='В городе ' + str(weather['name'])\
+        	+ ' температура: ' + str(float(weather['main']['temp'])) + ' °C' + '\n'\
+        	+ 'Максимальная температура: ' + str(float(weather['main']['temp_max'])) + ' °C' + '\n'\
+        	+ 'Минимальная температура: ' + str(float(weather['main']['temp_min'])) + ' °C' + '\n'\
+        	+ 'Давление: ' + str(float(weather['main']['pressure'])) + '\n'\
+        	+ 'Влажность: ' + str(float(weather['main']['humidity'])) + ' %' + '\n')
+
+
         except:
             bot.send_message(mess.chat.id, 'Город ' + city + ' не найден!')
 
@@ -71,7 +73,8 @@ def callback_worker(call):
         bot.send_message(mess.chat.id, 'Погода на сегодня и ближайшую неделю')
         count = 0
         while count < 8:
-            bot.send_message(mess.chat.id, get_forecast(count, weather))
+            bot.send_photo(mess.chat.id, get_icon(count, weather), caption=get_forecast(count, weather))
+            # bot.send_sticker(mess.chat.id, get_icon(count, weather)+ get_forecast(count, weather))
             count += 1
 
 
@@ -89,10 +92,20 @@ def get_date(timestamp):
 
 
 def get_forecast(count, weather):
-    forecast = get_date(weather.get('daily')[count].get('dt')) + '\n' + 'Минимальная: ' + str(float(weather.get('daily')[count].get('temp').get('min'))) + ' °C' + '\n' + 'Максимальная: ' + str(float(weather.get('daily')[
-        count].get('temp').get('max'))) + ' °C' + '\n' + 'Давление: ' + str(float(weather.get('daily')[count].get('pressure'))) + '\n' + 'Влажность: ' + str(float(weather.get('daily')[count].get('humidity'))) + ' %' + '\n'
+    forecast = get_date(weather.get('daily')[count].get('dt')) + '\n'\
+    + 'Минимальная: ' + str(float(weather.get('daily')[count].get('temp').get('min'))) + ' °C' + '\n'\
+    + 'Максимальная: ' + str(float(weather.get('daily')[count].get('temp').get('max'))) + ' °C' + '\n'\
+    + 'Давление: ' + str(weather.get('daily')[count].get('pressure')) + '\n'\
+    + 'Влажность: ' + str(float(weather.get('daily')[count].get('humidity'))) + ' %' + '\n'
     return forecast
 
+
+def get_icon(count, weather):
+	icon = weather.get('daily')[count].get('weather')[0].get('icon')
+	url = f'http://openweathermap.org/img/wn/{icon}@2x.png'
+	# image = Image.open(urlopen(url))
+	# print(image)
+	return url
 
 if __name__ == '__main__':
     bot.polling(none_stop=True, interval=0)
