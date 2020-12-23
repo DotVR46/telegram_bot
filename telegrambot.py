@@ -65,8 +65,7 @@ def callback_worker(call):
 
     elif call.data == "daily":
         lon, lat = get_json()['coord']['lon'], get_json()['coord']['lat']
-        url = f'https://api.openweathermap.org/data/2.5/onecall?lon={lon}&lat={lat}\
-        &exclude=hourly,minutely,current,alerts&appid={config.api_key}&units=metric'
+        url = f'https://api.openweathermap.org/data/2.5/onecall?lon={lon}&lat={lat}&exclude=hourly,minutely,current,alerts&appid={config.api_key}&units=metric'
         result = requests.get(url)
         weather = result.json()
         bot.send_message(mess.chat.id, 'Погода на сегодня и ближайшую неделю')
@@ -77,8 +76,7 @@ def callback_worker(call):
 
 
 def get_json():
-    url = f'http://api.openweathermap.org/data/2.5/weather?\
-    q={city}&appid={config.api_key}&units=metric'
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={config.api_key}&units=metric'
     result = requests.get(url)
     weather = result.json()
     return weather
