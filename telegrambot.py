@@ -78,7 +78,8 @@ def callback_worker(call):
 
 
 def get_json():
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={config.api_key}&units=metric'
+    url = f'http://api.openweathermap.org/data/2.5/weather?\
+    q={city}&appid={config.api_key}&units=metric'
     result = requests.get(url)
     weather = result.json()
     return weather
