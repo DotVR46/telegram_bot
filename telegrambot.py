@@ -73,7 +73,6 @@ def callback_worker(call):
         count = 0
         while count < 8:
             bot.send_photo(mess.chat.id, get_icon(count, weather), caption=get_forecast(count, weather))
-            # bot.send_sticker(mess.chat.id, get_icon(count, weather)+ get_forecast(count, weather))
             count += 1
 
 
@@ -103,8 +102,6 @@ def get_forecast(count, weather):
 def get_icon(count, weather):
 	icon = weather.get('daily')[count].get('weather')[0].get('icon')
 	url = f'http://openweathermap.org/img/wn/{icon}@4x.png'
-	# image = Image.open(urlopen(url))
-	# print(image)
 	return url
 
 if __name__ == '__main__':
