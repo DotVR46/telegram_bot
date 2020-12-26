@@ -22,9 +22,16 @@ def weather_send(message):
     city = message.text
     global mess
     mess = message
+    global url_current
+    url_current = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={config.api_key}&units=metric'
+
 
     try:
-        weather = get_json()
+        weather = get_json(url_current)
+        global lon
+        lon = weather['coord']['lon']
+        global lat
+        lat = weather['coord']['lat']
         if weather['name'] != None:
 	        keyboard = types.InlineKeyboardMarkup()  # наша клавиатура
 	        key_current = types.InlineKeyboardButton(
@@ -44,9 +51,10 @@ def weather_send(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
-    weather = get_json()
+    
     if call.data == "current":  # call.data это callback_data, которую мы указали при объявлении кнопки
         try:
+        	weather = get_json(url_current)
         	icon = weather.get('weather')[0].get('icon')
         	url = f'http://openweathermap.org/img/wn/{icon}@4x.png'
 
@@ -64,10 +72,9 @@ def callback_worker(call):
 
 
     elif call.data == "daily":
-        lon, lat = get_json()['coord']['lon'], get_json()['coord']['lat']
-        url = f'https://api.openweathermap.org/data/2.5/onecall?lon={lon}&lat={lat}&exclude=hourly,minutely,current,alerts&appid={config.api_key}&units=metric'
-        result = requests.get(url)
-        weather = result.json()
+        global url_daily
+        url_daily = f'https://api.openweathermap.org/data/2.5/onecall?lon={lon}&lat={lat}&exclude=hourly,minutely,current,alerts&appid={config.api_key}&units=metric'
+        weather = get_json(url_daily)
         bot.send_message(mess.chat.id, 'Погода на сегодня и ближайшую неделю')
         count = 0
         while count < 8:
@@ -75,8 +82,7 @@ def callback_worker(call):
             count += 1
 
 
-def get_json():
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={config.api_key}&units=metric'
+def get_json(url):
     result = requests.get(url)
     weather = result.json()
     return weather
